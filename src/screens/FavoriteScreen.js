@@ -17,64 +17,72 @@ import {
 export default function FavoriteScreen() {
   const navigation = useNavigation();
 
-  // Assuming you have a similar structure for recipes in your Redux store
+  // Redux selector
   const favoriteRecipes = useSelector((state) => state.favorites);
   const favoriteRecipesList = favoriteRecipes?.favoriterecipes || [];
-  console.log(favoriteRecipes.favoriterecipes);
-  console.log('favoriteRecipesList',favoriteRecipesList);
-  
-  
 
   if (favoriteRecipesList.length === 0) {
     return (
       <View style={styles.emptyContainer}>
         <Text style={styles.emptyText}>No favorite recipes yet!</Text>
-        {/* add back button */}
         <TouchableOpacity
           onPress={() => navigation.goBack()}
-          style={{
-            backgroundColor: "#2563EB",
-            padding: 10,
-            borderRadius: 5,
-            marginTop: 10,
-            width: 100,
-            alignItems: "center ",
-          }}
+          style={styles.goBackButton}
+          testID="goBackButton"
         >
-          <Text style={{ color: "#fff" }}>Go back</Text>
+          <Text style={styles.goBackButtonText}>Go back</Text>
         </TouchableOpacity>
       </View>
     );
   }
 
+  const renderItem = ({ item }) => (
+    <TouchableOpacity
+      style={styles.cardContainer}
+      onPress={() => navigation.navigate("RecipeDetailScreen", item)}
+      testID="favoriteRecipeCard"
+    >
+      <Image source={{ uri: item.recipeImage }} style={styles.recipeImage} />
+      <View>
+        <Text style={styles.recipeTitle}>{item.recipeName}</Text>
+        <Text style={styles.recipeCategory}>{item.recipeCategory}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+
   return (
-    <>
-      {/* Heading */}
-      <View testID="FavoriteRecipes">
+    <View style={{ flex: 1 }}>
+      <View testID="FavoriteRecipes" style={{ marginBottom: hp(2) }}>
         <Text
-          style={{ fontSize: hp(3.8), marginTop: hp(4), marginLeft: 20 }}
-          className="font-semibold text-neutral-600"
+          style={{
+            fontSize: hp(3.8),
+            marginTop: hp(4),
+            marginLeft: 20,
+            fontWeight: "600",
+            color: "#4B5563",
+          }}
         >
           My Favorite Recipes
         </Text>
       </View>
-    
+
       <TouchableOpacity
         onPress={() => navigation.goBack()}
-        style={{
-          backgroundColor: "#2563EB",
-          padding: 10,
-          borderRadius: 5,
-          marginTop: 10,
-          width: 100,
-          alignItems: "center",
-          marginLeft: 20,
-        }}
+        style={styles.goBackButton}
+        testID="goBackButton"
       >
-        <Text style={{ color: "#fff" }}>Go back</Text>
+        <Text style={styles.goBackButtonText}>Go back</Text>
       </TouchableOpacity>
-    
-    </>
+
+      <FlatList
+        data={favoriteRecipesList}
+        keyExtractor={(item) => item.idFood.toString()}
+        renderItem={renderItem}
+        contentContainerStyle={styles.listContentContainer}
+        showsVerticalScrollIndicator={false}
+        testID="favoriteRecipesList"
+      />
+    </View>
   );
 }
 
@@ -87,6 +95,19 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: hp(2.5),
     color: "#6B7280", // text-neutral-600
+  },
+  goBackButton: {
+    backgroundColor: "#2563EB",
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+    width: 100,
+    alignItems: "center",
+    marginLeft: 20,
+  },
+  goBackButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
   },
   listContentContainer: {
     paddingHorizontal: wp(4),
@@ -115,5 +136,9 @@ const styles = StyleSheet.create({
     fontSize: hp(2),
     fontWeight: "bold",
     color: "#4B5563", // text-neutral-700
+  },
+  recipeCategory: {
+    fontSize: hp(1.6),
+    color: "#9CA3AF", // text-neutral-400
   },
 });
